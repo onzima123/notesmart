@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="description" content="NoteSmart — simple notes, reminders and ideas in one place.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>NoteSmart</title>
+<style>
+:root{--blue:#1d4ed8;--bg:#f4f7fb;--panel:#fff;--text:#172033;--muted:#64748b;--line:#e2e8f0;--soft:#eaf1ff;--danger:#b91c1c}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+body.dark{--bg:#0b1220;--panel:#111c30;--text:#edf2ff;--muted:#a7b4ca;--line:#27354d;--soft:#1b2d50}
+header{background:var(--blue);color:white;padding:18px 16px 20px;position:sticky;top:0;z-index:5;box-shadow:0 4px 18px #102b6b22}
+.top{max-width:900px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}.logo{background:white;color:var(--blue);border-radius:12px;width:42px;height:42px;display:grid;place-items:center;font-size:23px;font-weight:900}
+h1{font-size:21px;margin:0}.tag{font-size:12px;opacity:.86;margin-top:2px}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:10px 13px;font-weight:650}
+.iconbtn{background:#ffffff20;color:white;border:1px solid #ffffff45}
+main{max-width:900px;margin:auto;padding:16px 14px 100px}
+.searchrow{display:flex;gap:8px;margin-bottom:14px}.searchrow input{flex:1}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);padding:12px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1d4ed81c}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}.toolbar select{width:auto;min-width:120px;flex:1}
+.primary{background:var(--blue);color:white}.secondary{background:var(--soft);color:var(--blue)}.ghost{background:var(--panel);color:var(--text);border:1px solid var(--line)}
+.stats{display:flex;gap:8px;margin:0 0 15px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:10px 12px;flex:1}.stat b{display:block;font-size:18px}.stat span{color:var(--muted);font-size:12px}
+.notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;min-height:150px;display:flex;flex-direction:column;gap:8px;box-shadow:0 3px 10px #17203308}
+.note.pinned{border-top:4px solid #f59e0b}.note h3{margin:0;font-size:16px;overflow-wrap:anywhere}.preview{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--muted);font-size:14px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:11px}.pill{background:var(--soft);color:var(--blue);border-radius:999px;padding:4px 8px;font-size:11px;align-self:flex-start}
+.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{padding:7px 9px;font-size:12px}.empty{text-align:center;color:var(--muted);padding:42px 12px;grid-column:1/-1}.empty strong{display:block;color:var(--text);font-size:18px;margin-bottom:5px}
+.fab{position:fixed;right:20px;bottom:22px;background:var(--blue);color:white;border-radius:999px;width:58px;height:58px;font-size:27px;box-shadow:0 8px 22px #1d4ed844;z-index:6}
+dialog{width:min(94vw,600px);max-height:90vh;overflow:auto;border:1px solid var(--line);border-radius:18px;background:var(--panel);color:var(--text);padding:0;box-shadow:0 20px 70px #0004}
+dialog::backdrop{background:#08132999}.modalhead{padding:17px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.modalbody{padding:18px;display:grid;gap:12px}.modalfoot{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.fieldlabel{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px}
+textarea{min-height:180px;resize:vertical}.small{font-size:12px;color:var(--muted)}.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:11px;margin:25px 0 0}
+@media(min-width:650px){main{padding-top:22px}.fab{right:calc((100vw - 900px)/2 + 22px)}}
+</style>
+</head>
+<body>
+<header><div class="top">
+ <div class="brand"><div class="logo">N</div><div><h1>NoteSmart</h1><div class="tag">Your notes. Your knowledge. Your success.</div></div></div>
+ <button class="iconbtn" id="themeBtn" aria-label="Toggle dark mode">☾</button>
+</div></header>
+<main>
+ <div class="searchrow"><input id="search" type="search" placeholder="Search your notes…" aria-label="Search notes"><button class="ghost" id="exportBtn">Export</button></div>
+ <div class="stats"><div class="stat"><b id="totalCount">0</b><span>All notes</span></div><div class="stat"><b id="pinnedCount">0</b><span>Pinned</span></div><div class="stat"><b id="categoryCount">0</b><span>Categories</span></div></div>
+ <div class="toolbar"><select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option></select><select id="sortBy" aria-label="Sort notes"><option value="updated">Recently updated</option><option value="created">Oldest first</option><option value="title">Title A–Z</option></select><button class="secondary" id="importBtn">Import backup</button><input type="file" id="importFile" accept="application/json,.json" class="hidden"></div>
+ <section class="notes" id="notes" aria-live="polite"></section>
+ <footer>Notes are saved on this device. Export a backup regularly to protect your work.</footer>
+</main>
+<button class="fab" id="newBtn" aria-label="Create a note">+</button>
+<dialog id="editor">
+ <form id="noteForm">
+  <div class="modalhead"><strong id="editorTitle">New note</strong><button type="button" class="ghost" id="closeBtn">Close</button></div>
+  <div class="modalbody">
+   <input id="noteTitle" maxlength="120" placeholder="Note title" required>
+   <textarea id="noteBody" placeholder="Write your note here…" required></textarea>
+   <div><label class="fieldlabel" for="noteCategory">Category</label><input id="noteCategory" maxlength="40" list="categorySuggestions" placeholder="e.g. Work, School, Ideas"><datalist id="categorySuggestions"><option>Personal</option><option>Work</option><option>School</option><option>Ideas</option><option>Tasks</option></datalist></div>
+   <label><input id="notePinned" type="checkbox" style="width:auto;margin-right:7px">Pin this note to the top</label>
+   <div class="small" id="savedInfo">Your note is stored on this device.</div>
+  </div>
+  <div class="modalfoot"><button type="button" class="ghost" id="deleteBtn">Delete</button><button type="submit" class="primary">Save note</button></div>
+ </form>
+</dialog>
+<script>
+const KEY='notesmart_notes_v1', THEME='notesmart_theme_v1';
+let notes=[], editingId=null;
+const $=id=>document.getElementById(id);
+function load(){try{notes=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(notes))notes=[]}catch(e){notes=[]}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(notes));return true}catch(e){alert('Could not save. Your device storage may be full. Please export your notes.');return false}}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmt(ts){return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}
+function categories(){return [...new Set(notes.map(n=>(n.category||'Personal').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
+function refreshCategories(){const el=$('categoryFilter'),old=el.value;el.innerHTML='<option value="">All categories</option>'+categories().map(c=>`<option>${esc(c)}</option>`).join('');el.value=categories().includes(old)?old:'';$('categoryCount').textContent=categories().length}
+function render(){
+ refreshCategories();const q=$('search').value.trim().toLowerCase(),cat=$('categoryFilter').value,sort=$('sortBy').value;
+ $('totalCount').textContent=notes.length;$('pinnedCount').textContent=notes.filter(n=>n.pinned).length;
+ let arr=notes.filter(n=>(!cat||(n.category||'Personal')===cat)&&(!q||(n.title+' '+n.body+' '+n.category).toLowerCase().includes(q)));
+ arr.sort((a,b)=>Number(b.pinned)-Number(a.pinned)||(sort==='title'?a.title.localeCompare(b.title):sort==='created'?a.created-b.created:b.updated-a.updated));
+ const root=$('notes');
+ if(!arr.length){root.innerHTML=`<div class="empty"><strong>${notes.length?'No matching notes':'Your notebook is ready'}</strong>${notes.length?'Try another search or category.':'Tap + to write your first note.'}</div>`;return}
+ root.innerHTML=arr.map(n=>`<article class="note ${n.pinned?'pinned':''}">
+  ${n.pinned?'<span class="pill">Pinned</span>':''}<h3>${esc(n.title)}</h3><div class="preview">${esc(n.body)}</div>
+  <div class="meta"><span>${esc(n.category||'Personal')}</span><span>${fmt(n.updated)}</span></div>
+  <div class="actions"><button class="secondary" data-edit="${n.id}">Open / Edit</button><button class="ghost" data-pin="${n.id}">${n.pinned?'Unpin':'Pin'}</button><button class="ghost" data-copy="${n.id}">Copy</button></div>
+ </article>`).join('');
+}
+function openEditor(id=null){
+ editingId=id;const n=notes.find(x=>x.id===id);$('editorTitle').textContent=n?'Edit note':'New note';
+ $('noteTitle').value=n?.title||'';$('noteBody').value=n?.body||'';$('noteCategory').value=n?.category||'Personal';$('notePinned').checked=!!n?.pinned;
+ $('deleteBtn').classList.toggle('hidden',!n);$('savedInfo').textContent=n?'Last updated '+fmt(n.updated):'Your note is stored on this device.';
+ $('editor').showModal();setTimeout(()=>$('noteTitle').focus(),80)
+}
+$('noteForm').addEventListener('submit',e=>{e.preventDefault();const title=$('noteTitle').value.trim(),body=$('noteBody').value.trim();if(!title||!body)return;
+ const now=Date.now(),category=$('noteCategory').value.trim()||'Personal';
+ if(editingId){const n=notes.find(x=>x.id===editingId);if(n)Object.assign(n,{title,body,category,pinned:$('notePinned').checked,updated:now})}
+ else notes.push({id:crypto.randomUUID?crypto.randomUUID():String(now)+Math.random(),title,body,category,pinned:$('notePinned').checked,created:now,updated:now});
+ persist();$('editor').close();render()
+});
+$('newBtn').onclick=()=>openEditor();$('closeBtn').onclick=()=>$('editor').close();
+$('deleteBtn').onclick=()=>{if(!editingId)return;if(confirm('Delete this note permanently from this device?')){notes=notes.filter(n=>n.id!==editingId);persist();$('editor').close();render()}};
+$('notes').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.edit||b.dataset.pin||b.dataset.copy,n=notes.find(x=>x.id===id);if(!n)return;
+ if(b.dataset.edit)openEditor(id);
+ if(b.dataset.pin!==undefined){n.pinned=!n.pinned;n.updated=Date.now();persist();render()}
+ if(b.dataset.copy!==undefined){try{await navigator.clipboard.writeText(n.title+'\\n\\n'+n.body);b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1200)}catch(err){prompt('Copy your note:',n.title+'\\n\\n'+n.body)}}
+});
+$('search').oninput=render;$('categoryFilter').onchange=render;$('sortBy').onchange=render;
+$('themeBtn').onclick=()=>{document.body.classList.toggle('dark');localStorage.setItem(THEME,document.body.classList.contains('dark')?'dark':'light');$('themeBtn').textContent=document.body.classList.contains('dark')?'☀':'☾'};
+if(localStorage.getItem(THEME)==='dark'){document.body.classList.add('dark');$('themeBtn').textContent='☀'}
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({app:'NoteSmart',version:1,exportedAt:new Date().toISOString(),notes},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='notesmart-backup.json';a.click();URL.revokeObjectURL(a.href)};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text()),incoming=Array.isArray(data)?data:data.notes;if(!Array.isArray(incoming))throw Error('invalid');if(!confirm(`Import ${incoming.length} notes? Existing notes with the same IDs may be replaced.`))return;const map=new Map(notes.map(n=>[n.id,n]));incoming.forEach(n=>{if(n.title&&n.body){const id=n.id||String(Date.now()+Math.random());map.set(id,{id,title:String(n.title),body:String(n.body),category:String(n.category||'Personal'),pinned:!!n.pinned,created:Number(n.created)||Date.now(),updated:Number(n.updated)||Date.now()})}});notes=[...map.values()];persist();render();alert('Import complete.')}catch(err){alert('That backup file could not be read. Choose a NoteSmart JSON backup.')}e.target.value=''};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+load();render();
+</script>
+</body></html>
